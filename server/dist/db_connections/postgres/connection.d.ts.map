@@ -1,1 +1,0 @@
-{"version":3,"file":"connection.d.ts","sourceRoot":"","sources":["../../../src/db_connections/postgres/connection.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,YAAY,EAAE,MAAM,IAAI,CAAC;AAe1C;;;;GAIG;AACH,iBAAe,OAAO,CAAC,MAAM,GAAE,YAAiB,GAAG,OAAO,CAAC,MAAM,CAAC,CAiBjE;AAED;;GAEG;AACH,iBAAe,UAAU,IAAI,OAAO,CAAC,IAAI,CAAC,CAezC;;;;;AAED,wBAAuC"}

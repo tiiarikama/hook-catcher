@@ -1,1 +1,0 @@
-{"version":3,"file":"connectionManager.d.ts","sourceRoot":"","sources":["../../src/websockets/connectionManager.ts"],"names":[],"mappings":"AACA,OAAO,EAAmB,MAAM,EAAE,MAAM,MAAM,CAAC;AAC/C,OAAO,EAAE,gBAAgB,EAAE,MAAM,UAAU,CAAC;AAI5C,iBAAS,IAAI,CAAC,MAAM,EAAE,MAAM,GAAG,IAAI,CAsClC;AAED,iBAAS,SAAS,CAAC,KAAK,EAAE,MAAM,EAAE,OAAO,EAAE,gBAAgB,GAAG,IAAI,CAYjE;;;;;AAED,wBAAmC"}
