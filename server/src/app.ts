@@ -22,6 +22,6 @@ app.get("/health", (_req, res) => {
 app.use("/api/bins", binHandler);
 
 // Mount catch-all webhook route here
-app.use("/", webhookHandler);
+app.use("/hooks", webhookHandler);
 
 export default app;
