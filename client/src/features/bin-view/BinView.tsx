@@ -126,7 +126,7 @@ export default function BinView() {
 }
 
 function BasketInfoHeader({ bin }: { bin: BinWithRequests | null }) {
-  const basketUrl = env.API_URL + "/" + (bin && bin.bin.id)
+  const basketUrl = env.API_URL + "/hooks/" + (bin && bin.bin.id)
 
   return (
     <section className="mx-auto max-w-4xl p-3">
