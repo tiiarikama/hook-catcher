@@ -26,8 +26,8 @@ export async function findRequestDocumentsByBinId(
 ): Promise<RequestDocument[]> {
   const client = await mongoConnection.connect();
   const collection = client
-    .db(mongoConnection.MONGO_DB_NAME)
-    .collection<RequestDocument>(mongoConnection.MONGO_COLLECTION_NAME);
+    .db(process.env.MONGO_DB_NAME ?? "hookcatcher")
+    .collection<RequestDocument>(process.env.MONGO_COLLECTION_NAME ?? "request_payloads");
 
   const result = await collection.find({ bin_id: id }).toArray();
 
@@ -64,8 +64,8 @@ export async function deleteAllRequestDocumentsWithBinId(
 ): Promise<void> {
   const client = await mongoConnection.connect();
   const collection = client
-    .db(mongoConnection.MONGO_DB_NAME)
-    .collection<RequestDocument>(mongoConnection.MONGO_COLLECTION_NAME);
+    .db(process.env.MONGO_DB_NAME ?? "hookcatcher")
+    .collection<RequestDocument>(process.env.MONGO_COLLECTION_NAME ?? "request_payloads");
 
   await collection.deleteMany({ bin_id: id });
 }

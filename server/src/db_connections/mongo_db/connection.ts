@@ -1,18 +1,5 @@
 import { MongoClient, MongoClientOptions } from "mongodb";
 
-// Default connection configuration
-const defaultConfig: MongoClientOptions = {
-  connectTimeoutMS: 5000,
-  serverSelectionTimeoutMS: 5000,
-  maxPoolSize: 10,
-  retryWrites: process.env.MONGO_RETRY_WRITES === 'true',
-};
-
-const defaultUri: string = process.env.MONGO_URI ?? "mongodb://localhost:27017";
-
-const MONGO_DB_NAME = process.env.MONGO_DB_NAME ?? "hookcatcher";
-const MONGO_COLLECTION_NAME = "request_payloads";
-
 let client: MongoClient | null = null;
 
 /**
@@ -22,7 +9,7 @@ let client: MongoClient | null = null;
  * @returns The connected MongoClient instance.
  */
 async function connect(
-  uri: string = defaultUri,
+  uri?: string,
   options: MongoClientOptions = {},
 ): Promise<MongoClient> {
   if (client) {
@@ -30,7 +17,16 @@ async function connect(
     return client;
   }
 
-  client = new MongoClient(uri, { ...defaultConfig, ...options });
+  const defaultConfig: MongoClientOptions = {
+    connectTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 5000,
+    maxPoolSize: 10,
+    retryWrites: process.env.MONGO_RETRY_WRITES === 'true',
+  };
+
+  const resolvedUri = uri ?? process.env.MONGO_URI ?? "mongodb://localhost:27017";
+
+  client = new MongoClient(resolvedUri, { ...defaultConfig, ...options });
 
   try {
     await client.connect();
@@ -63,4 +59,4 @@ async function disconnect(): Promise<void> {
   }
 }
 
-export default { connect, disconnect, MONGO_COLLECTION_NAME, MONGO_DB_NAME };
+export default { connect, disconnect };
