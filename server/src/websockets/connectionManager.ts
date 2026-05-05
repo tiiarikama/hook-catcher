@@ -2,6 +2,7 @@ import { trace } from "@opentelemetry/api";
 import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
 import { BroadcastRequest } from "../types";
+import { activeConnections } from "../observability";
 
 const tracer = trace.getTracer("hookcatcher-backend");
 const binClients = new Map<string, Set<WebSocket>>();
@@ -26,6 +27,7 @@ function init(server: Server): void {
         binClients.set(binId, new Set());
       }
       binClients.get(binId)!.add(websocket);
+      activeConnections.add(1, { "bin.id": binId });
 
       console.log(`Client connected to bin: ${binId}`);
 
@@ -44,6 +46,7 @@ function init(server: Server): void {
 
         if (websocketConnections) {
           websocketConnections.delete(websocket);
+          activeConnections.add(-1, { "bin.id": binId });
 
           if (websocketConnections.size === 0) {
             binClients.delete(binId);

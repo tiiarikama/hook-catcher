@@ -10,12 +10,14 @@ import {
   findExpiredBins,
 } from "../db_connections/binRepo";
 import { Bin, BinResponse, BinWithRequestDocuments } from "../types";
+import { binsCreated, binsDeleted, binsCleanedUp } from "../observability";
 
 const BIN_ID_LENGTH = 10;
 
 export async function createBin(): Promise<BinResponse> {
   const id = nanoid(BIN_ID_LENGTH);
   const bin: Bin = await repoCreateBin(id);
+  binsCreated.add(1, { "bin.id": bin.id });
 
   const span = trace.getActiveSpan();
   if (span) {
@@ -88,6 +90,7 @@ export async function deleteBin(id: string): Promise<void> {
 
   await deleteAllRequestDocumentsWithBinId(id);
   await repoDeleteBin(id);
+  binsDeleted.add(1, { "bin.id": id });
 }
 
 export async function cleanupExpiredBins(): Promise<number> {
@@ -100,6 +103,7 @@ export async function cleanupExpiredBins(): Promise<number> {
       await deleteBin(bin.id);
     }
 
+    binsCleanedUp.add(expiredBins.length);
     span.setAttribute("cleanup.bins_removed", expiredBins.length);
     span.end();
 

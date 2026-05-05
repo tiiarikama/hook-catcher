@@ -7,6 +7,7 @@ import {
 } from "../db_connections/webhookRepo";
 import { RequestDocument, RequestRecord } from "../types";
 import wsManager from "../websockets/connectionManager";
+import { webhooksCaptured, webhookCaptureDuration } from "../observability";
 
 export async function captureRequest(
   binId: string,
@@ -15,6 +16,8 @@ export async function captureRequest(
   headers: IncomingHttpHeaders,
   body: any,
 ): Promise<RequestRecord> {
+  const start = Date.now();
+
   const span = trace.getActiveSpan();
   if (span) {
     span.setAttributes({
@@ -73,6 +76,9 @@ export async function captureRequest(
     type: "new_request",
     payload: document,
   });
+
+  webhooksCaptured.add(1, { "bin.id": binId });
+  webhookCaptureDuration.record(Date.now() - start, { "bin.id": binId });
 
   return requestRecord;
 }

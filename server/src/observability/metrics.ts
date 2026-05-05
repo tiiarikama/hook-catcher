@@ -2,11 +2,14 @@ import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 import { metrics } from "@opentelemetry/api";
 
+const honeycombApiKey = process.env.HONEYCOMB_API_KEY;
+if (!honeycombApiKey) throw new Error("HONEYCOMB_API_KEY is not defined");
+
 export const metricReader = new PeriodicExportingMetricReader({
   exporter: new OTLPMetricExporter({
     url: "https://api.honeycomb.io/v1/metrics",
     headers: {
-      "x-honeycomb-team": process.env.HONEYCOMB_API_KEY ?? "",
+      "x-honeycomb-team": honeycombApiKey,
       "x-honeycomb-dataset": process.env.HONEYCOMB_DATASET ?? "hookcatcher",
     },
   }),
