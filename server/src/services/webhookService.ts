@@ -61,6 +61,13 @@ export async function captureRequest(
     received_at,
   );
 
+  if (span) {
+    span.setAttributes({
+      "request.pg_id": requestRecord.id,
+      "request.mongo_id": mongoId,
+    });
+  }
+
   //6. Push new incoming requests to client via websocket
   wsManager.broadcast(binId, {
     type: "new_request",
