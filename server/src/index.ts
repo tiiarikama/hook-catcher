@@ -1,8 +1,11 @@
-import { shutdownTracing } from "./observability/tracing";
+import { config } from "dotenv";
+config();
+
 import app from "./app";
 import wsManager from "./websockets/connectionManager";
 import http from "http";
 import { startScheduledCleanup } from "./cleanup/scheduledCleanup";
+import { shutdown } from "./observability";
 
 async function main() {
   const PORT = process.env.PORT || 3000;
@@ -17,7 +20,7 @@ async function main() {
   process.on("SIGTERM", () => {
     clearInterval(cleanupTimer);
     server.close(async () => {
-      await shutdownTracing();
+      await shutdown();
       console.log("Server shut down gracefully.");
       process.exit(0);
     });
