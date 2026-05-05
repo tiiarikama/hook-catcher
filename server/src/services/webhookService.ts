@@ -1,4 +1,5 @@
 import { IncomingHttpHeaders } from "http";
+import { trace } from "@opentelemetry/api";
 import { findBinById } from "../db_connections/binRepo";
 import {
   createRequestDocument,
@@ -14,6 +15,16 @@ export async function captureRequest(
   headers: IncomingHttpHeaders,
   body: any,
 ): Promise<RequestRecord> {
+  const span = trace.getActiveSpan();
+  if (span) {
+    span.setAttributes({
+      "bin.id": binId,
+      "webhook.method": method,
+      "webhook.path": path,
+      "webhook.has_body": body !== undefined && body !== null,
+      "webhook.headers_count": Object.keys(headers).length,
+    });
+  }
   // 1. Validate bin exists
   const bin = await findBinById(binId);
 
@@ -47,14 +58,14 @@ export async function captureRequest(
     mongoId,
     method,
     path,
-    received_at
+    received_at,
   );
 
   //6. Push new incoming requests to client via websocket
   wsManager.broadcast(binId, {
-    type: "new_request", 
+    type: "new_request",
     payload: document,
-  })
+  });
 
   return requestRecord;
 }
