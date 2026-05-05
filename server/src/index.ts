@@ -1,4 +1,4 @@
-import { shutdownTracing } from "./tracing";
+import { shutdownTracing } from "./observability/tracing";
 import app from "./app";
 import wsManager from "./websockets/connectionManager";
 import http from "http";
