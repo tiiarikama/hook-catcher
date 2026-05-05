@@ -1,7 +1,9 @@
+import { trace } from "@opentelemetry/api";
 import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
 import { BroadcastRequest } from "../types";
 
+const tracer = trace.getTracer("hookcatcher-backend");
 const binClients = new Map<string, Set<WebSocket>>();
 
 function init(server: Server): void {
@@ -27,6 +29,15 @@ function init(server: Server): void {
 
       console.log(`Client connected to bin: ${binId}`);
 
+      tracer.startActiveSpan("ws.client_connected", (span) => {
+        span.setAttributes({
+          "bin.id": binId,
+          "ws.clients_count": binClients.get(binId)!.size,
+        });
+
+        span.end();
+      });
+
       // cleanup on disconnect: removes websocket connection from a specific bin, and removes the bin if no connects remain
       websocket.on("close", () => {
         const websocketConnections = binClients.get(binId);
@@ -39,6 +50,15 @@ function init(server: Server): void {
           }
         }
         console.log(`Client disconnected from bin: ${binId}`);
+
+        tracer.startActiveSpan("ws.client_disconnected", (span) => {
+          span.setAttributes({
+            "bin.id": binId,
+            "ws.clients_count": binClients.get(binId)?.size ?? 0,
+          });
+
+          span.end();
+        });
       });
     },
   );
@@ -48,6 +68,14 @@ function broadcast(binId: string, request: BroadcastRequest): void {
   const websocketConnections = binClients.get(binId);
 
   if (!websocketConnections) return;
+
+  const span = trace.getActiveSpan();
+  if (span) {
+    span.setAttributes({
+      "bin.id": binId,
+      "ws.clients_count": websocketConnections.size,
+    });
+  }
 
   const requestData = JSON.stringify(request);
 
